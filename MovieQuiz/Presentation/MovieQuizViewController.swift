@@ -2,13 +2,13 @@ import UIKit
 
 final class MovieQuizViewController: UIViewController {
 
-    @IBOutlet weak var yesButton: UIButton!
-    @IBOutlet weak var noButton: UIButton!
-    @IBOutlet weak var questionLabel: UILabel!
+    @IBOutlet private weak var yesButton: UIButton!
+    @IBOutlet private weak var noButton: UIButton!
+    @IBOutlet private weak var questionLabel: UILabel!
         
-    @IBOutlet var textLabel: UILabel!
-    @IBOutlet var imageView: UIImageView!
-    @IBOutlet var counterLabel: UILabel!
+    @IBOutlet private var textLabel: UILabel!
+    @IBOutlet private var imageView: UIImageView!
+    @IBOutlet private var counterLabel: UILabel!
     
     private var currentQuestionIndex = 0
     private var correctAnswers: Int = 0
@@ -27,20 +27,12 @@ final class MovieQuizViewController: UIViewController {
     ]
     
     @IBAction private func noButtonClicked(_ sender: UIButton) {
-        
-        let currentQuestion = questions[currentQuestionIndex]
-        let givenAnswer = false
-        showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
-        
+        handleAnswer(givenAnswer: false)
     }
     
     
     @IBAction private func yesButtonClicked(_ sender: UIButton) {
-        
-        let currentQuestion = questions[currentQuestionIndex]
-        let givenAnswer = true
-        showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
-        
+        handleAnswer(givenAnswer: true)
     }
     
     private func showAnswerResult(isCorrect: Bool) {
@@ -51,7 +43,7 @@ final class MovieQuizViewController: UIViewController {
         
         imageView.layer.masksToBounds = true
         imageView.layer.borderWidth = 8
-        imageView.layer.cornerRadius = 8
+        imageView.layer.cornerRadius = 20
         
         imageView.layer.borderColor = isCorrect ? UIColor.ypGreen.cgColor : UIColor.ypRed.cgColor
         
@@ -67,7 +59,7 @@ final class MovieQuizViewController: UIViewController {
       if currentQuestionIndex == questions.count - 1 { // 1
           showQuizResult()
       } else {
-        
+          enableButtons()
           currentQuestionIndex += 1
           let nextQuestion = questions[currentQuestionIndex]
           let viewModel = convert(model: nextQuestion, index: currentQuestionIndex, totalQuestions: questions.count)
@@ -76,13 +68,13 @@ final class MovieQuizViewController: UIViewController {
       }
     }
     
-    struct QuizQuestion {
+    private struct QuizQuestion {
         let image: String
         let text: String
         let correctAnswer: Bool
     }
     
-    struct QuizStepViewModel {
+    private struct QuizStepViewModel {
         let image: UIImage // картинка фильма
         let question: String // вопрос о рейтинге квиза
         let questionNumber: String // строка с индексом номера
@@ -127,6 +119,25 @@ final class MovieQuizViewController: UIViewController {
         button.layer.cornerRadius = 15
     }
     
+    private func disableButtons() {
+        yesButton.isEnabled = false
+        noButton.isEnabled = false
+    }
+        
+    private func enableButtons() {
+        yesButton.isEnabled = true
+        noButton.isEnabled = true
+    }
+    
+    private func handleAnswer(givenAnswer: Bool) {
+        
+        disableButtons()
+    
+        let currentQuestion = questions[currentQuestionIndex]
+        showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
+        
+    }
+    
     private func showQuizResult() {
         let alert = UIAlertController(
             title: "Этот раунд окончен!",
@@ -151,6 +162,7 @@ final class MovieQuizViewController: UIViewController {
         show(quiz: quizStep)
 
         imageView.layer.borderColor = UIColor.clear.cgColor
+        enableButtons()
     }
 }
 
